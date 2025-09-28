@@ -44,3 +44,6 @@ jobs:
           git add data/
           git commit -m "Update data"
           git push
+
+      - name: Run Summarizer
+        run: python collectors/summarizer.py
