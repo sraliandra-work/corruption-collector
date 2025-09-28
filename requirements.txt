@@ -1,1 +1,5 @@
-
+feedparser
+snscrape
+pandas
+google-api-python-client
+praw
