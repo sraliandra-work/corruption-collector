@@ -1,1 +1,46 @@
+name: Data Collector
 
+on:
+  schedule:
+    - cron: "0 */3 * * *"   # setiap 3 jam
+  workflow_dispatch:        # bisa manual trigger
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run News Collector
+        run: python collectors/news_collector.py
+
+      - name: Run Twitter Collector
+        run: python collectors/twitter_collector.py
+
+      - name: Run YouTube Collector
+        run: python collectors/youtube_collector.py
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+
+      - name: Run Reddit Collector
+        run: python collectors/reddit_collector.py
+        env:
+          REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+          REDDIT_SECRET: ${{ secrets.REDDIT_SECRET }}
+          REDDIT_USER_AGENT: ${{ secrets.REDDIT_USER_AGENT }}
+
+      - name: Commit & Push data
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add data/
+          git commit -m "Update data"
+          git push
